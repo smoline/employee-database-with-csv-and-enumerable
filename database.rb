@@ -126,7 +126,16 @@ class MyDatabase
   end
 
   def total_by_position
-    puts "Total Employees..."
+    instructors = 0
+    campus_director = 0
+    students = 0
+    total_director = @people.select { |person| person.position == "Campus Director" }
+    campus_director = total_director.length
+    total_instructors = @people.select { |person| person.position == "Instructor" }
+    instructors = total_instructors.length
+    total_students = @people.select { |person| person.position == "Students" }
+    students = total_students.length
+    puts "Total Employees by Position:\nInstructors:\t\t#{instructors}\nCampus Director:\t#{campus_director}\nStudents:\t\t#{students}"
   end
 
   def employee_report
