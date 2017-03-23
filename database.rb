@@ -111,17 +111,8 @@ class MyDatabase
   end
 
   def employee_report
-    CSV.foreach("employees.csv", headers: true) do |row|
-      puts name
-    end
-    #    = row["name"]
-    #   phone = row['phone']
-    #   address = row["address"]
-    #   position = row["position"]
-    #   salary = row["salary"]
-    #   slack = row["slack"]
-    #   github = row["github"]
-    # @people.puts puts "Report\n\n"
+    # @people.foreach 
+    puts "Report\n\n"
   end
 
   def save_database
