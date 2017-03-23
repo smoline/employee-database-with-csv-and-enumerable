@@ -110,9 +110,31 @@ class MyDatabase
     save_database
   end
 
+  def total_salary
+    total_instructor_salary = 0
+    total_campus_director_salary = 0
+    total_instructors = @people.select { |person| person.position == "Instructor" }
+    total_instructors.each do |person|
+      total_instructor_salary += person.salary.to_i
+    end
+    total_director = @people.select { |person| person.position == "Campus Director" }
+    total_director.each do |person|
+      total_campus_director_salary += person.salary.to_i
+    end
+    puts "Total Salary of Instructors:\t\t$#{total_instructor_salary}"
+    puts "Total Salary of Campus Director:\t$#{total_campus_director_salary}"
+  end
+
+  def total_by_position
+    puts "Total Employees..."
+  end
+
   def employee_report
-    # @people.foreach 
-    puts "Report\n\n"
+    @people.each { |person|
+    puts "#{person.name}\t#{person.address}\t#{person.phone}\n\t#{person.position}\t#{person.salary}\n\t#{person.slack}\t#{person.github}\n\n" }
+    total_salary
+    total_by_position
+    puts "End of Report\n\n"
   end
 
   def save_database
