@@ -40,7 +40,7 @@ class MyDatabase
     puts "R to see a Report of all Employees"
     puts "Or just press enter to exit."
     choice = gets.chomp
-    return choice
+    return choice.upcase
   end
 
   def add_person
@@ -48,10 +48,10 @@ class MyDatabase
     puts "What is the person's name?"
     name = gets.chomp
     found_name = @people.find { |person| person.name == name }
-    if found_name != nil
-      puts "That Employee already exists."
+    if found_name
+      puts "That Employee already exists.\n\n"
     elsif name.empty?
-        puts "Name can not be blank"
+      puts "Name can not be blank"
     else
       puts "What is their phone number?"
       phone = gets.chomp
@@ -121,8 +121,7 @@ class MyDatabase
     total_director.each do |person|
       total_campus_director_salary += person.salary.to_i
     end
-    puts "Total Salary of Instructors:\t\t$#{total_instructor_salary}"
-    puts "Total Salary of Campus Director:\t$#{total_campus_director_salary}"
+    printf("%-43s$%8d\n%-43s$%8d\n\n", "Total Salary of Instructors:", "#{total_instructor_salary}", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
   end
 
   def total_by_position
@@ -133,14 +132,15 @@ class MyDatabase
     campus_director = total_director.length
     total_instructors = @people.select { |person| person.position == "Instructor" }
     instructors = total_instructors.length
-    total_students = @people.select { |person| person.position == "Students" }
+    total_students = @people.select { |person| person.position == "Student" }
     students = total_students.length
-    puts "Total Employees by Position:\nInstructors:\t\t#{instructors}\nCampus Director:\t#{campus_director}\nStudents:\t\t#{students}"
+    printf("%-30s\n%10s%18s%16d\n%10s%18s%16d\n%10s%18s%16d\n\n", "Total Employees by Position:", " ", "Instructors:", "#{instructors}", " ", "Campus Director:", "#{campus_director}", " ", "Students:", "#{students}")
   end
 
   def employee_report
     @people.each { |person|
-    puts "#{person.name}\t#{person.address}\t#{person.phone}\n\t#{person.position}\t#{person.salary}\n\t#{person.slack}\t#{person.github}\n\n" }
+      printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
+    }
     total_salary
     total_by_position
     puts "End of Report\n\n"
