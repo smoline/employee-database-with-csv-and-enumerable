@@ -125,22 +125,17 @@ class MyDatabase
   end
 
   def total_by_position
-    instructors = 0
-    campus_director = 0
-    students = 0
-    total_director = @people.select { |person| person.position == "Campus Director" }
-    campus_director = total_director.length
-    total_instructors = @people.select { |person| person.position == "Instructor" }
-    instructors = total_instructors.length
-    total_students = @people.select { |person| person.position == "Student" }
-    students = total_students.length
-    printf("%-30s\n%10s%18s%16d\n%10s%18s%16d\n%10s%18s%16d\n\n", "Total Employees by Position:", " ", "Instructors:", "#{instructors}", " ", "Campus Director:", "#{campus_director}", " ", "Students:", "#{students}")
+    results = @people.group_by {|person| person.position}.map {|key,value| [key,value.count]}.to_h
+    printf("%-30s\n", "Total Employees by Position:")
+    results.each do |position,count|
+      printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
+    end
   end
 
   def employee_report
-    @people.each { |person|
+    @people.each do |person|
       printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
-    }
+    end
     total_salary
     total_by_position
     puts "End of Report\n\n"
