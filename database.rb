@@ -132,7 +132,17 @@ class MyDatabase
     end
   end
 
-  def employee_report
+  def report_choice
+    puts "How would you like your report?"
+    puts "1. To view on your screen"
+    puts "2. To print to an text file"
+    puts "3. To print to an HTML file"
+    puts "Or just press enter to exit."
+    r_choice = gets.chomp
+    return r_choice
+  end
+
+  def employee_report_console
     @people.each do |person|
       printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
     end
@@ -141,9 +151,46 @@ class MyDatabase
     puts "End of Report\n\n"
   end
 
+  def employee_report_text_file
+    File.open("employee-report.txt", "w") do |text|
+      @people.each do |person|
+        text.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
+        total_salary
+        total_by_position
+      end
+      text.puts "End of Report\n\n"
+    end
+    puts "Saving Text file...\n\n"
+  end
+
+  def employee_report_html
+    File.open("employee-report.html", "w") do |html|
+      html.write(<DOCTYPE!>\n)
+      @people.each do |person|
+        html.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
+      end
+      html.puts "End of Report\n\n"
+    end
+    puts "Saving HTML file..."
+  end
+
+  def employee_report
+    r_choice = report_choice
+    if r_choice == "1"
+      employee_report_console
+    elsif r_choice == "2"
+      employee_report_text_file
+    elsif r_choice == "3"
+      employee_report_html
+    else
+      puts "That is not one of the choices.\n\n"
+    end
+  end
+
   def save_database
     CSV.open("employees.csv", "w") do |csv|
       csv << ["name", "phone", "address", "position", "salary", "slack", "github"]
+      # csv = %w{name phone address position salary slack github}
       @people.each do |person|
         csv << [person.name, person.phone, person.address, person.position, person.salary, person.slack, person.github]
       end
