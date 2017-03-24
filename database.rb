@@ -89,8 +89,8 @@ class MyDatabase
   def search_for_person
     print "Please enter the person's name, Slack Account, or Github Account: "
     search_name = gets.chomp
-    found_name = @people.find { |person| person.name == search_name || person.slack == search_name || person.github == search_name }
-    if found_name != nil
+    found_name = @people.find { |person| person.name == search_name || person.slack == search_name || person.github == search_name || person.name.include?(search_name) }
+    if found_name
       puts "Search Results:\nName: #{found_name.name}\nPhone: #{found_name.phone}\nAddress: #{found_name.address}\nPosition: #{found_name.position}\nSalary: $#{found_name.salary}\nSlack: #{found_name.slack}\nGitHub: #{found_name.github}\n\n"
     else
       puts "That person does not exist.\n\n"
