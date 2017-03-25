@@ -102,7 +102,7 @@ class MyDatabase
     print "Please enter the name of the person you want to delete: "
     delete_name = gets.chomp
     found_name = @people.delete_if { |person| person.name == delete_name || person.slack == delete_name || person.github == delete_name }
-    if found_name != nil
+    if found_name
       puts "#{delete_name} has been deleted.\n\n"
     else
       puts "That person does not exist.\n\n"
@@ -115,8 +115,7 @@ class MyDatabase
     total_instructors = @people.select do |person|
       person.position == "Instructor"
     end
-    total_instructors.each { |person|
-      total_instructor_salary += person.salary.to_i }
+    total_instructors.each { |person| total_instructor_salary += person.salary.to_i }
     return total_instructor_salary
   end
 
@@ -159,6 +158,7 @@ class MyDatabase
 
   def employee_report_text_file
     File.open("employee-report.txt", "w") do |text|
+      text.printf("Employee Report\n\n")
       @people.each do |person|
         text.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
       end
@@ -177,14 +177,20 @@ class MyDatabase
   end
 
   def employee_report_html
-    File.open("employee-report.html", "w") do |html|
-      html.write("<DOCTYPE!>\n")
+    File.open("report.html", "w") do |html|
+      html.write('<!DOCTYPE html>'"\n"'<html>'"\n\n"'<head lang="en">'"\n\t"'<meta charset="UTF-8">'"\n\t"'<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">'"\n\t"'<title>Employee Report</title>'"\n\t"'<link rel="stylesheet" href="/screen.css">'"\n"'</head>'"\n"'<body>'"\n\t"'<header>'"\n\t\t"'<h1>Employee Report</h1>'"\n\t"'</header>'"\n\t"'<main>'"\n\t\t"'<table style="width:100%">')
       @people.each do |person|
-        html.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Name"'</th>'"\n\t\t\t\t"'<th>'"Address"'</th>'"\n\t\t\t\t"'<th>'"Phone"'</th>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td'" rowspan=\"5\""'>'"#{person.name}"'</td>'"\n\t\t\t\t"'<td>'"#{person.address}"'</td>'"\n\t\t\t\t"'<td>'"#{person.phone}"'</td>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Position"'</th>'"\n\t\t\t\t"'<th>'"Salary"'</th>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{person.position}"'</td>'"\n\t\t\t\t"'<td>'"$#{person.salary}"'</td>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Slack Account"'</th>'"\n\t\t\t\t"'<th>'"Github Account"'</th>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{person.slack}"'</td>'"\n\t\t\t\t"'<td>'"#{person.github}"'</td>'"\n\t\t\t"'</tr>')
       end
-      html.puts "End of Report\n\n"
+      html.write("\n\t\t"'</table>'"\n\t\t"'<p>'"End of Report"'</p>'"\n\t"'</main>'"\n\t"'<footer>'"\n\t\t"'<p>'"&copy; 2017 The Company, Inc. All rights reserved."'</p>'"\n\t"'</footer>'"\n")
+      html.write('</body>'"\n"'</html>')
     end
-    puts "Saving HTML file..."
+    puts "Saving HTML file...\n\n"
   end
 
   def employee_report
