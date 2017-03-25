@@ -10,5 +10,21 @@ Toni      200 Pine Street                   555-4444
           Campus Director                  $ 3000000
           amazing_toni                  amazing_toni
 
+Sheri     2803 Safe Harbor Drive            786-0525
+          Student                          $       0
+          smoline                            smoline
+
+Mark      123 Hippy Crunchyvil              123-0987
+          Sage                             $  100000
+          marky                                 mark
+
+Total Salary of Instructors:               $ 3000000
+Total Salary of Campus Director:           $ 3000000
+
+Total Employees by Position:  
+                 Instructor:               2
+            Campus Director:               1
+                    Student:               1
+                       Sage:               1
 End of Report
 

@@ -110,26 +110,26 @@ class MyDatabase
     save_database
   end
 
-  def total_salary
+  def total_salary_instructors
     total_instructor_salary = 0
+    total_instructors = @people.select do |person|
+      person.position == "Instructor"
+    end
+    total_instructors.each { |person|
+      total_instructor_salary += person.salary.to_i }
+    return total_instructor_salary
+  end
+
+  def total_salary_director
     total_campus_director_salary = 0
-    total_instructors = @people.select { |person| person.position == "Instructor" }
-    total_instructors.each do |person|
-      total_instructor_salary += person.salary.to_i
-    end
     total_director = @people.select { |person| person.position == "Campus Director" }
-    total_director.each do |person|
-      total_campus_director_salary += person.salary.to_i
-    end
-    printf("%-43s$%8d\n%-43s$%8d\n\n", "Total Salary of Instructors:", "#{total_instructor_salary}", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
+    total_director.each { |person| total_campus_director_salary += person.salary.to_i }
+    return total_campus_director_salary
   end
 
   def total_by_position
     results = @people.group_by {|person| person.position}.map {|key,value| [key,value.count]}.to_h
-    printf("%-30s\n", "Total Employees by Position:")
-    results.each do |position,count|
-      printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
-    end
+    return results
   end
 
   def report_choice
@@ -137,7 +137,6 @@ class MyDatabase
     puts "1. To view on your screen"
     puts "2. To print to an text file"
     puts "3. To print to an HTML file"
-    puts "Or just press enter to exit."
     r_choice = gets.chomp
     return r_choice
   end
@@ -146,8 +145,15 @@ class MyDatabase
     @people.each do |person|
       printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
     end
-    total_salary
-    total_by_position
+    total_instructor_salary = total_salary_instructors
+    printf("%-43s$%8d\n", "Total Salary of Instructors:", "#{total_instructor_salary}")
+    total_campus_director_salary = total_salary_director
+    printf("%-43s$%8d\n\n", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
+    results = total_by_position
+    printf("%-30s\n", "Total Employees by Position:")
+    results.each do |position,count|
+      printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
+    end
     puts "End of Report\n\n"
   end
 
@@ -155,8 +161,15 @@ class MyDatabase
     File.open("employee-report.txt", "w") do |text|
       @people.each do |person|
         text.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
-        total_salary
-        total_by_position
+      end
+      total_instructor_salary = total_salary_instructors
+      text.printf("%-43s$%8d\n", "Total Salary of Instructors:", "#{total_instructor_salary}")
+      total_campus_director_salary = total_salary_director
+      text.printf("%-43s$%8d\n\n", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
+      results = total_by_position
+      text.printf("%-30s\n", "Total Employees by Position:")
+      results.each do |position,count|
+        text.printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
       end
       text.puts "End of Report\n\n"
     end
@@ -165,7 +178,7 @@ class MyDatabase
 
   def employee_report_html
     File.open("employee-report.html", "w") do |html|
-      html.write(<DOCTYPE!>\n)
+      html.write("<DOCTYPE!>\n")
       @people.each do |person|
         html.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
       end
@@ -190,7 +203,6 @@ class MyDatabase
   def save_database
     CSV.open("employees.csv", "w") do |csv|
       csv << ["name", "phone", "address", "position", "salary", "slack", "github"]
-      # csv = %w{name phone address position salary slack github}
       @people.each do |person|
         csv << [person.name, person.phone, person.address, person.position, person.salary, person.slack, person.github]
       end
