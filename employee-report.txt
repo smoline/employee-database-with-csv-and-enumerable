@@ -16,16 +16,20 @@ Mark      123 Hippy Crunchyvil              123-0987
           Sage                             $  100000
           marky                                 mark
 
-Bruno     123 Somewhere in Oldsmar          765-9876
+Sheri     2803 Safe Harbor Drive            786-0525
           Student                          $       0
-          brunoz                              brunox
+          smoline                            smoline
 
-Total Salary of Instructors:               $ 3000000
-Total Salary of Campus Director:           $ 3000000
+   Total Salaries by Position:
+                   Instructor:      $  3000000
+              Campus Director:      $  3000000
+                         Sage:      $   100000
+                      Student:      $        0
 
-Total Employees by Position:
-                 Instructor:               2
-            Campus Director:               1
-                       Sage:               1
-                    Student:               1
+  Total Employees by Position:
+                   Instructor:               2
+              Campus Director:               1
+                         Sage:               1
+                      Student:               1
 End of Report
+

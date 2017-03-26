@@ -110,24 +110,14 @@ class MyDatabase
     save_database
   end
 
-  def total_salary_instructors
-    total_instructor_salary = 0
-    total_instructors = @people.select do |person|
-      person.position == "Instructor"
-    end
-    total_instructors.each { |person| total_instructor_salary += person.salary.to_i }
-    return total_instructor_salary
-  end
-
-  def total_salary_director
-    total_campus_director_salary = 0
-    total_director = @people.select { |person| person.position == "Campus Director" }
-    total_director.each { |person| total_campus_director_salary += person.salary.to_i }
-    return total_campus_director_salary
+  def total_salary_by_position
+    people_by_position = @people.group_by { |person| person.position }
+    salary_by_position = people_by_position.map { |position,people_for_position| [position, people_for_position.collect { |person| person.salary.to_i }.sum] }
+    return salary_by_position
   end
 
   def total_by_position
-    results = @people.group_by {|person| person.position}.map {|key,value| [key,value.count]}.to_h
+    results = @people.group_by { |person| person.position }.map {|key,value| [key,value.count]}.to_h
     return results
   end
 
@@ -144,14 +134,16 @@ class MyDatabase
     @people.each do |person|
       printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
     end
-    total_instructor_salary = total_salary_instructors
-    printf("%-43s$%8d\n", "Total Salary of Instructors:", "#{total_instructor_salary}")
-    total_campus_director_salary = total_salary_director
-    printf("%-43s$%8d\n\n", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
+    salary_total = total_salary_by_position
+    printf("%30s\n", "Total Salaries by Position:")
+    salary_total.each do |position,salary|
+      printf("%10s%20s%6s$%9d\n", " ", "#{position}:", " ", "#{salary}")
+    end
+    printf("\n")
     results = total_by_position
-    printf("%-30s\n", "Total Employees by Position:")
+    printf("%30s\n", "Total Employees by Position:")
     results.each do |position,count|
-      printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
+      printf("%10s%20s%16d\n", " ", "#{position}:", "#{count}")
     end
     puts "End of Report\n\n"
   end
@@ -162,14 +154,16 @@ class MyDatabase
       @people.each do |person|
         text.printf("%-10s%-30s%12s\n%10s%-33s$%8d\n%10s%-30s%12s\n\n", "#{person.name}", "#{person.address}", "#{person.phone}", " ", "#{person.position}", "#{person.salary}", " ", "#{person.slack}", "#{person.github}")
       end
-      total_instructor_salary = total_salary_instructors
-      text.printf("%-43s$%8d\n", "Total Salary of Instructors:", "#{total_instructor_salary}")
-      total_campus_director_salary = total_salary_director
-      text.printf("%-43s$%8d\n\n", "Total Salary of Campus Director:", "#{total_campus_director_salary}")
+      salary_total = total_salary_by_position
+      text.printf("%30s\n", "Total Salaries by Position:")
+      salary_total.each do |position,salary|
+        text.printf("%10s%20s%6s$%9d\n", " ", "#{position}:", " ", "#{salary}")
+      end
+      text.printf("\n")
       results = total_by_position
-      text.printf("%-30s\n", "Total Employees by Position:")
+      text.printf("%30s\n", "Total Employees by Position:")
       results.each do |position,count|
-        text.printf("%10s%18s%16d\n", " ", "#{position}:", "#{count}")
+        text.printf("%10s%20s%16d\n", " ", "#{position}:", "#{count}")
       end
       text.puts "End of Report\n\n"
     end
@@ -178,17 +172,31 @@ class MyDatabase
 
   def employee_report_html
     File.open("report.html", "w") do |html|
-      html.write('<!DOCTYPE html>'"\n"'<html>'"\n\n"'<head lang="en">'"\n\t"'<meta charset="UTF-8">'"\n\t"'<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">'"\n\t"'<title>Employee Report</title>'"\n\t"'<link rel="stylesheet" href="/screen.css">'"\n"'</head>'"\n"'<body>'"\n\t"'<header>'"\n\t\t"'<h1>Employee Report</h1>'"\n\t"'</header>'"\n\t"'<main>'"\n\t\t"'<table style="width:100%">')
+      html.print('<!DOCTYPE html>'"\n"'<html>'"\n\n"'<head lang="en">'"\n\t"'<meta charset="UTF-8">'"\n\t"'<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">'"\n\t"'<title>Employee Report</title>'"\n\t"'<link rel="stylesheet" href="./screen.css" type="text/css">'"\n"'</head>'"\n"'<body>'"\n\t"'<header>'"\n\t\t"'<h1>Employee Report</h1>'"\n\t"'</header>'"\n\t"'<main>'"\n\t\t"'<table style="width:100%">')
       @people.each do |person|
         html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Name"'</th>'"\n\t\t\t\t"'<th>'"Address"'</th>'"\n\t\t\t\t"'<th>'"Phone"'</th>'"\n\t\t\t"'</tr>')
-        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td'" rowspan=\"5\""'>'"#{person.name}"'</td>'"\n\t\t\t\t"'<td>'"#{person.address}"'</td>'"\n\t\t\t\t"'<td>'"#{person.phone}"'</td>'"\n\t\t\t"'</tr>')
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td rowspan="5">'"#{person.name}"'</td>'"\n\t\t\t\t"'<td>'"#{person.address}"'</td>'"\n\t\t\t\t"'<td>'"#{person.phone}"'</td>'"\n\t\t\t"'</tr>')
         html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Position"'</th>'"\n\t\t\t\t"'<th>'"Salary"'</th>'"\n\t\t\t"'</tr>')
         html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{person.position}"'</td>'"\n\t\t\t\t"'<td>'"$#{person.salary}"'</td>'"\n\t\t\t"'</tr>')
         html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th>'"Slack Account"'</th>'"\n\t\t\t\t"'<th>'"Github Account"'</th>'"\n\t\t\t"'</tr>')
         html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{person.slack}"'</td>'"\n\t\t\t\t"'<td>'"#{person.github}"'</td>'"\n\t\t\t"'</tr>')
       end
-      html.write("\n\t\t"'</table>'"\n\t\t"'<p>'"End of Report"'</p>'"\n\t"'</main>'"\n\t"'<footer>'"\n\t\t"'<p>'"&copy; 2017 The Company, Inc. All rights reserved."'</p>'"\n\t"'</footer>'"\n")
-      html.write('</body>'"\n"'</html>')
+      html.print("\n\t\t"'</table>')
+      html.print("\n\t\t"'<table style="width:100%">')
+      salary_total = total_salary_by_position
+      html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th colspan="2">'"Total Salaries by Position"'</th>'"\n\t\t\t"'</tr>')
+      salary_total.each do |position,salary|
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{position}:"'</td>'"\n\t\t\t\t"'<td>'"$#{salary}"'</td>'"\n\t\t\t"'</tr>')
+      end
+      html.print("\n\t\t"'</table>')
+      results = total_by_position
+      html.print("\n\t\t"'<table style="width:100%">')
+      html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<th colspan="2">'"Total Employees by Position:"'</th>'"\n\t\t\t"'</tr>')
+      results.each { |position,count|
+        html.print("\n\t\t\t"'<tr>'"\n\t\t\t\t"'<td>'"#{position}:"'</td>'"\n\t\t\t\t"'<td>'"#{count}"'</td>'"\n\t\t\t"'</tr>') }
+      html.print("\n\t\t"'</table>')
+      html.print("\n\t\t"'<p>'"End of Report"'</p>'"\n\t"'</main>'"\n\t"'<footer>'"\n\t\t"'<p>'"&copy; 2017 The Company, Inc. All rights reserved."'</p>'"\n\t"'</footer>'"\n")
+      html.print('</body>'"\n"'</html>')
     end
     puts "Saving HTML file...\n\n"
   end
