@@ -1,4 +1,4 @@
-# TIY Database with CSV and Enumerables
+# Employee Database with CSV and Enumerables
 
 * This program is a continuation of the first:
   * All searching and deleting methods use a more appropriate enumerable instead of loop
